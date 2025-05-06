@@ -78,7 +78,20 @@ void generate_create_file(const char *filename);
 void generate_delete_file(const char *filename);
 void generate_add_function(const char *funcname, const char *filename);
 void generate_delete_function(const char *funcname, const char *filename);
-void generate_for_loop(const char *var, int limit, int step, const char *filename);
+void generate_for_loop(const char *var, int limit, int step, const char *funcname, const char *filename);
+void generate_if_statement(const char *var, const char *op, int value, const char *funcname, const char *filename);
+void generate_if_else_statement(const char *var, const char *op, int value, const char *funcname, const char *filename);
+void generate_switch_statement(const char *var, int cases, const char *funcname, const char *filename);
+void generate_case_statement(int value, const char *filename);
+void generate_default_case(const char *filename);
+void generate_break_statement(const char *filename);
+void generate_close_brace(const char *filename);
+int variable_exists_in_function(const char *var, const char *funcname, const char *filename);
+void generate_array(const char *array_name, int start, int end, const char *funcname, const char *filename);
+void generate_array_iteration(const char *array_name, const char *index_var, const char *funcname, const char *filename);
+void optimize_code(const char *filename);
+
+
 
 extern int yylex();
 extern FILE *yyin;
@@ -89,7 +102,7 @@ void yyerror(const char *s) {
 
 
 /* Line 189 of yacc.c  */
-#line 93 "file_operations.tab.c"
+#line 106 "file_operations.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -129,7 +142,30 @@ void yyerror(const char *s) {
      WITH = 268,
      INCREMENT = 269,
      IN = 270,
-     UP_TO = 271
+     UP_TO = 271,
+     IF = 272,
+     ELSE = 273,
+     SWITCH = 274,
+     CASE = 275,
+     DEFAULT = 276,
+     BREAK = 277,
+     COLON = 278,
+     CONDITIONS = 279,
+     ITERATE = 280,
+     ARRAY = 281,
+     USING = 282,
+     INDEX = 283,
+     FROM = 284,
+     OPTIMIZE = 285,
+     FUNCTIONS = 286,
+     EQ = 287,
+     NEQ = 288,
+     LE = 289,
+     GE = 290,
+     LT = 291,
+     GT = 292,
+     CLOSE = 293,
+     BRACE = 294
    };
 #endif
 
@@ -140,15 +176,16 @@ typedef union YYSTYPE
 {
 
 /* Line 214 of yacc.c  */
-#line 20 ".\\file_operations.y"
+#line 33 ".\\file_operations.y"
 
     char* str;
     int num;
+    char** str_array;
 
 
 
 /* Line 214 of yacc.c  */
-#line 152 "file_operations.tab.c"
+#line 189 "file_operations.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -160,7 +197,7 @@ typedef union YYSTYPE
 
 
 /* Line 264 of yacc.c  */
-#line 164 "file_operations.tab.c"
+#line 201 "file_operations.tab.c"
 
 #ifdef short
 # undef short
@@ -373,22 +410,22 @@ union yyalloc
 #endif
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  9
+#define YYFINAL  20
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   26
+#define YYLAST   155
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  17
+#define YYNTOKENS  40
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  2
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  6
+#define YYNRULES  27
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  27
+#define YYNSTATES  152
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   271
+#define YYMAXUTOK   294
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -423,7 +460,9 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
+      35,    36,    37,    38,    39
 };
 
 #if YYDEBUG
@@ -431,22 +470,46 @@ static const yytype_uint8 yytranslate[] =
    YYRHS.  */
 static const yytype_uint8 yyprhs[] =
 {
-       0,     0,     3,     7,    11,    17,    23
+       0,     0,     3,     7,    11,    17,    23,    37,    41,    51,
+      61,    71,    81,    91,   101,   112,   123,   134,   145,   156,
+     167,   179,   185,   190,   195,   200,   212,   224
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      18,     0,    -1,     5,     7,     3,    -1,     6,     7,     3,
+      41,     0,    -1,     5,     7,     3,    -1,     6,     7,     3,
       -1,     5,     8,     3,    15,     3,    -1,     6,     8,     3,
       15,     3,    -1,     5,     9,    10,     3,    16,     4,    13,
-      14,     4,    15,     3,    -1
+      14,     4,    15,     3,    15,     3,    -1,    30,     7,     3,
+      -1,     5,    17,     3,    32,     4,    15,     3,    15,     3,
+      -1,     5,    17,     3,    33,     4,    15,     3,    15,     3,
+      -1,     5,    17,     3,    36,     4,    15,     3,    15,     3,
+      -1,     5,    17,     3,    37,     4,    15,     3,    15,     3,
+      -1,     5,    17,     3,    34,     4,    15,     3,    15,     3,
+      -1,     5,    17,     3,    35,     4,    15,     3,    15,     3,
+      -1,     5,    17,     3,    32,     4,    18,    15,     3,    15,
+       3,    -1,     5,    17,     3,    33,     4,    18,    15,     3,
+      15,     3,    -1,     5,    17,     3,    36,     4,    18,    15,
+       3,    15,     3,    -1,     5,    17,     3,    37,     4,    18,
+      15,     3,    15,     3,    -1,     5,    17,     3,    34,     4,
+      18,    15,     3,    15,     3,    -1,     5,    17,     3,    35,
+       4,    18,    15,     3,    15,     3,    -1,     5,    19,     3,
+      24,    13,     4,    20,    15,     3,    15,     3,    -1,     5,
+      20,     4,    15,     3,    -1,     5,    21,    15,     3,    -1,
+       5,    22,    15,     3,    -1,    38,    39,    15,     3,    -1,
+       5,    26,     3,    29,     4,    12,     4,    15,     3,    15,
+       3,    -1,     5,    25,    26,     3,    27,    28,     3,    15,
+       3,    15,     3,    -1,     5,     7,     3,    13,     4,    31,
+       3,     3,     3,     3,     3,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    32,    32,    36,    40,    45,    50
+       0,    49,    49,    53,    57,    62,    67,    73,    77,    83,
+      89,    95,   101,   107,   113,   119,   125,   131,   137,   143,
+     149,   155,   159,   163,   167,   171,   178,   185
 };
 #endif
 
@@ -457,7 +520,10 @@ static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "IDENTIFIER", "NUMBER", "CREATE",
   "DELETE", "FILE_TOKEN", "FUNCTION_TOKEN", "FOR", "LOOP", "UP", "TO",
-  "WITH", "INCREMENT", "IN", "UP_TO", "$accept", "command", 0
+  "WITH", "INCREMENT", "IN", "UP_TO", "IF", "ELSE", "SWITCH", "CASE",
+  "DEFAULT", "BREAK", "COLON", "CONDITIONS", "ITERATE", "ARRAY", "USING",
+  "INDEX", "FROM", "OPTIMIZE", "FUNCTIONS", "EQ", "NEQ", "LE", "GE", "LT",
+  "GT", "CLOSE", "BRACE", "$accept", "command", 0
 };
 #endif
 
@@ -467,20 +533,26 @@ static const char *const yytname[] =
 static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271
+     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
+     275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
+     285,   286,   287,   288,   289,   290,   291,   292,   293,   294
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    17,    18,    18,    18,    18,    18
+       0,    40,    41,    41,    41,    41,    41,    41,    41,    41,
+      41,    41,    41,    41,    41,    41,    41,    41,    41,    41,
+      41,    41,    41,    41,    41,    41,    41,    41
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     3,     3,     5,     5,    11
+       0,     2,     3,     3,     5,     5,    13,     3,     9,     9,
+       9,     9,     9,     9,    10,    10,    10,    10,    10,    10,
+      11,     5,     4,     4,     4,    11,    11,    11
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -488,31 +560,57 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     1,
-       2,     0,     0,     3,     0,     0,     0,     0,     4,     0,
-       5,     0,     0,     0,     0,     0,     6
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       1,     2,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     3,     0,     7,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,    22,    23,     0,     0,
+       0,    24,     0,     4,     0,     0,     0,     0,     0,     0,
+       0,     0,    21,     0,     0,     5,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     8,
+       0,     9,     0,    12,     0,    13,     0,    10,     0,    11,
+       0,     0,     0,     0,     0,     0,    14,    15,    18,    19,
+      16,    17,     0,     0,     0,    27,     0,    20,    26,    25,
+       0,     6
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     3
+      -1,     5
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -9
-static const yytype_int8 yypact[] =
+#define YYPACT_NINF -38
+static const yytype_int16 yypact[] =
 {
-      -2,    -7,    -1,     5,     6,     7,     1,     9,    10,    -9,
-      -9,     0,    11,    -9,     2,    13,    -8,    15,    -9,    16,
-      -9,     8,    12,    18,     4,    20,    -9
+      -5,    -4,    31,     7,   -37,    12,    16,    27,    26,    37,
+      38,    39,    29,    30,    20,    44,    45,    46,    47,    36,
+     -38,    40,    41,    49,   -26,    18,    42,    51,    52,    55,
+      32,   -38,    48,   -38,    56,    58,    57,    50,    60,    61,
+      63,    64,    65,    66,    59,    68,   -38,   -38,    53,    69,
+      71,   -38,    54,   -38,    72,     5,     9,    11,    13,    17,
+      19,    73,   -38,    62,    67,   -38,    75,    70,    78,    74,
+      79,    76,    81,    77,    83,    80,    84,    82,    85,    86,
+      87,    90,    92,    91,    88,    89,    95,    93,    96,    94,
+      97,    98,   100,    99,   102,   101,   103,   104,   105,   106,
+     107,   108,   112,   109,   114,   110,   115,   111,   119,   113,
+     120,   116,   124,   117,   126,   127,   130,   131,   121,   -38,
+     132,   -38,   134,   -38,   135,   -38,   136,   -38,   137,   -38,
+     138,   128,   129,   133,   139,   142,   -38,   -38,   -38,   -38,
+     -38,   -38,   143,   144,   146,   -38,   140,   -38,   -38,   -38,
+     147,   -38
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -9,    -9
+     -38,   -38
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -522,25 +620,64 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-       4,     5,     6,     1,     2,     9,     7,     8,    19,    10,
-      11,    12,    13,    14,    16,    15,    18,    17,    20,    25,
-      21,    22,    24,    26,     0,     0,    23
+       1,     2,    19,     6,     7,     8,    38,    39,    40,    41,
+      42,    43,    20,     9,    18,    10,    11,    12,    13,    21,
+      68,    14,    15,    69,    70,     3,    72,    71,    74,    73,
+      22,    75,    76,     4,    78,    77,    23,    79,    16,    17,
+      24,    25,    44,    26,    27,    28,    29,    30,    31,    32,
+      33,    34,    37,    35,    46,    47,    36,    45,    48,    51,
+      53,    49,    52,    50,    55,    56,    54,    57,    58,    59,
+      60,    62,    61,    64,    65,     0,    67,    80,    83,    82,
+      63,    85,    87,    84,    89,    66,    91,    93,    95,    86,
+      81,    88,    90,    98,   100,    92,    99,    94,   103,   105,
+     107,    96,   101,   109,   102,   111,   113,    97,   104,   106,
+     117,     0,   118,   108,   110,   119,   112,   121,   123,   114,
+     115,   116,   125,   127,   120,   122,   124,   129,   126,   131,
+     132,   128,   130,   133,   134,   136,   135,   137,   138,   139,
+     140,   141,   145,   142,   143,   146,   147,   148,   144,   149,
+     151,     0,     0,     0,     0,   150
 };
 
 static const yytype_int8 yycheck[] =
 {
-       7,     8,     9,     5,     6,     0,     7,     8,    16,     3,
-       3,    10,     3,     3,     3,    15,     3,    15,     3,    15,
-       4,    13,     4,     3,    -1,    -1,    14
+       5,     6,    39,     7,     8,     9,    32,    33,    34,    35,
+      36,    37,     0,    17,     7,    19,    20,    21,    22,     3,
+      15,    25,    26,    18,    15,    30,    15,    18,    15,    18,
+       3,    18,    15,    38,    15,    18,    10,    18,     7,     8,
+       3,     3,    24,     4,    15,    15,    26,     3,     3,     3,
+       3,    15,     3,    13,     3,     3,    15,    15,     3,     3,
+       3,    29,     4,    15,     4,     4,    16,     4,     4,     4,
+       4,     3,    13,     4,     3,    -1,     4,     4,     3,    12,
+      27,     3,     3,    13,     3,    31,     3,     3,     3,    15,
+      28,    15,    15,     3,     3,    15,     4,    15,     3,     3,
+       3,    15,    14,     3,    15,     3,     3,    20,    15,    15,
+       3,    -1,     4,    15,    15,     3,    15,     3,     3,    15,
+      15,    15,     3,     3,    15,    15,    15,     3,    15,     3,
+       3,    15,    15,     3,     3,     3,    15,     3,     3,     3,
+       3,     3,     3,    15,    15,     3,     3,     3,    15,     3,
+       3,    -1,    -1,    -1,    -1,    15
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     5,     6,    18,     7,     8,     9,     7,     8,     0,
-       3,     3,    10,     3,     3,    15,     3,    15,     3,    16,
-       3,     4,    13,    14,     4,    15,     3
+       0,     5,     6,    30,    38,    41,     7,     8,     9,    17,
+      19,    20,    21,    22,    25,    26,     7,     8,     7,    39,
+       0,     3,     3,    10,     3,     3,     4,    15,    15,    26,
+       3,     3,     3,     3,    15,    13,    15,     3,    32,    33,
+      34,    35,    36,    37,    24,    15,     3,     3,     3,    29,
+      15,     3,     4,     3,    16,     4,     4,     4,     4,     4,
+       4,    13,     3,    27,     4,     3,    31,     4,    15,    18,
+      15,    18,    15,    18,    15,    18,    15,    18,    15,    18,
+       4,    28,    12,     3,    13,     3,    15,     3,    15,     3,
+      15,     3,    15,     3,    15,     3,    15,    20,     3,     4,
+       3,    14,    15,     3,    15,     3,    15,     3,    15,     3,
+      15,     3,    15,     3,    15,    15,    15,     3,     4,     3,
+      15,     3,    15,     3,    15,     3,    15,     3,    15,     3,
+      15,     3,     3,     3,     3,    15,     3,     3,     3,     3,
+       3,     3,    15,    15,    15,     3,     3,     3,     3,     3,
+      15,     3
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1354,7 +1491,7 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 32 ".\\file_operations.y"
+#line 49 ".\\file_operations.y"
     {
         generate_create_file((yyvsp[(3) - (3)].str));
         free((yyvsp[(3) - (3)].str));
@@ -1364,7 +1501,7 @@ yyreduce:
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 36 ".\\file_operations.y"
+#line 53 ".\\file_operations.y"
     {
         generate_delete_file((yyvsp[(3) - (3)].str));
         free((yyvsp[(3) - (3)].str));
@@ -1374,7 +1511,7 @@ yyreduce:
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 40 ".\\file_operations.y"
+#line 57 ".\\file_operations.y"
     {
         generate_add_function((yyvsp[(3) - (5)].str), (yyvsp[(5) - (5)].str));
         free((yyvsp[(3) - (5)].str));
@@ -1385,7 +1522,7 @@ yyreduce:
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 45 ".\\file_operations.y"
+#line 62 ".\\file_operations.y"
     {
         generate_delete_function((yyvsp[(3) - (5)].str), (yyvsp[(5) - (5)].str));
         free((yyvsp[(3) - (5)].str));
@@ -1396,18 +1533,270 @@ yyreduce:
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 50 ".\\file_operations.y"
+#line 67 ".\\file_operations.y"
     {
-        generate_for_loop((yyvsp[(4) - (11)].str), (yyvsp[(6) - (11)].num), (yyvsp[(9) - (11)].num), (yyvsp[(11) - (11)].str)); 
-        free((yyvsp[(4) - (11)].str));  // free IDENTIFIER
-        free((yyvsp[(11) - (11)].str)); // free IDENTIFIER
+        generate_for_loop((yyvsp[(4) - (13)].str), (yyvsp[(6) - (13)].num), (yyvsp[(9) - (13)].num), (yyvsp[(11) - (13)].str), (yyvsp[(13) - (13)].str));
+        free((yyvsp[(4) - (13)].str));
+        free((yyvsp[(11) - (13)].str));
+        free((yyvsp[(13) - (13)].str));
+      ;}
+    break;
+
+  case 7:
+
+/* Line 1455 of yacc.c  */
+#line 73 ".\\file_operations.y"
+    {
+        optimize_code((yyvsp[(3) - (3)].str));
+        free((yyvsp[(3) - (3)].str));
+      ;}
+    break;
+
+  case 8:
+
+/* Line 1455 of yacc.c  */
+#line 77 ".\\file_operations.y"
+    {
+        generate_if_statement((yyvsp[(3) - (9)].str), "==", (yyvsp[(5) - (9)].num), (yyvsp[(7) - (9)].str), (yyvsp[(9) - (9)].str));
+        free((yyvsp[(3) - (9)].str));
+        free((yyvsp[(7) - (9)].str));
+        free((yyvsp[(9) - (9)].str));
+      ;}
+    break;
+
+  case 9:
+
+/* Line 1455 of yacc.c  */
+#line 83 ".\\file_operations.y"
+    {
+        generate_if_statement((yyvsp[(3) - (9)].str), "!=", (yyvsp[(5) - (9)].num), (yyvsp[(7) - (9)].str), (yyvsp[(9) - (9)].str));
+        free((yyvsp[(3) - (9)].str));
+        free((yyvsp[(7) - (9)].str));
+        free((yyvsp[(9) - (9)].str));
+      ;}
+    break;
+
+  case 10:
+
+/* Line 1455 of yacc.c  */
+#line 89 ".\\file_operations.y"
+    {
+        generate_if_statement((yyvsp[(3) - (9)].str), "<", (yyvsp[(5) - (9)].num), (yyvsp[(7) - (9)].str), (yyvsp[(9) - (9)].str));
+        free((yyvsp[(3) - (9)].str));
+        free((yyvsp[(7) - (9)].str));
+        free((yyvsp[(9) - (9)].str));
+      ;}
+    break;
+
+  case 11:
+
+/* Line 1455 of yacc.c  */
+#line 95 ".\\file_operations.y"
+    {
+        generate_if_statement((yyvsp[(3) - (9)].str), ">", (yyvsp[(5) - (9)].num), (yyvsp[(7) - (9)].str), (yyvsp[(9) - (9)].str));
+        free((yyvsp[(3) - (9)].str));
+        free((yyvsp[(7) - (9)].str));
+        free((yyvsp[(9) - (9)].str));
+      ;}
+    break;
+
+  case 12:
+
+/* Line 1455 of yacc.c  */
+#line 101 ".\\file_operations.y"
+    {
+        generate_if_statement((yyvsp[(3) - (9)].str), "<=", (yyvsp[(5) - (9)].num), (yyvsp[(7) - (9)].str), (yyvsp[(9) - (9)].str));
+        free((yyvsp[(3) - (9)].str));
+        free((yyvsp[(7) - (9)].str));
+        free((yyvsp[(9) - (9)].str));
+      ;}
+    break;
+
+  case 13:
+
+/* Line 1455 of yacc.c  */
+#line 107 ".\\file_operations.y"
+    {
+        generate_if_statement((yyvsp[(3) - (9)].str), ">=", (yyvsp[(5) - (9)].num), (yyvsp[(7) - (9)].str), (yyvsp[(9) - (9)].str));
+        free((yyvsp[(3) - (9)].str));
+        free((yyvsp[(7) - (9)].str));
+        free((yyvsp[(9) - (9)].str));
+      ;}
+    break;
+
+  case 14:
+
+/* Line 1455 of yacc.c  */
+#line 113 ".\\file_operations.y"
+    {
+        generate_if_else_statement((yyvsp[(3) - (10)].str), "==", (yyvsp[(5) - (10)].num), (yyvsp[(8) - (10)].str), (yyvsp[(10) - (10)].str));
+        free((yyvsp[(3) - (10)].str));
+        free((yyvsp[(8) - (10)].str));
+        free((yyvsp[(10) - (10)].str));
+      ;}
+    break;
+
+  case 15:
+
+/* Line 1455 of yacc.c  */
+#line 119 ".\\file_operations.y"
+    {
+        generate_if_else_statement((yyvsp[(3) - (10)].str), "!=", (yyvsp[(5) - (10)].num), (yyvsp[(8) - (10)].str), (yyvsp[(10) - (10)].str));
+        free((yyvsp[(3) - (10)].str));
+        free((yyvsp[(8) - (10)].str));
+        free((yyvsp[(10) - (10)].str));
+      ;}
+    break;
+
+  case 16:
+
+/* Line 1455 of yacc.c  */
+#line 125 ".\\file_operations.y"
+    {
+        generate_if_else_statement((yyvsp[(3) - (10)].str), "<", (yyvsp[(5) - (10)].num), (yyvsp[(8) - (10)].str), (yyvsp[(10) - (10)].str));
+        free((yyvsp[(3) - (10)].str));
+        free((yyvsp[(8) - (10)].str));
+        free((yyvsp[(10) - (10)].str));
+      ;}
+    break;
+
+  case 17:
+
+/* Line 1455 of yacc.c  */
+#line 131 ".\\file_operations.y"
+    {
+        generate_if_else_statement((yyvsp[(3) - (10)].str), ">", (yyvsp[(5) - (10)].num), (yyvsp[(8) - (10)].str), (yyvsp[(10) - (10)].str));
+        free((yyvsp[(3) - (10)].str));
+        free((yyvsp[(8) - (10)].str));
+        free((yyvsp[(10) - (10)].str));
+      ;}
+    break;
+
+  case 18:
+
+/* Line 1455 of yacc.c  */
+#line 137 ".\\file_operations.y"
+    {
+        generate_if_else_statement((yyvsp[(3) - (10)].str), "<=", (yyvsp[(5) - (10)].num), (yyvsp[(8) - (10)].str), (yyvsp[(10) - (10)].str));
+        free((yyvsp[(3) - (10)].str));
+        free((yyvsp[(8) - (10)].str));
+        free((yyvsp[(10) - (10)].str));
+      ;}
+    break;
+
+  case 19:
+
+/* Line 1455 of yacc.c  */
+#line 143 ".\\file_operations.y"
+    {
+        generate_if_else_statement((yyvsp[(3) - (10)].str), ">=", (yyvsp[(5) - (10)].num), (yyvsp[(8) - (10)].str), (yyvsp[(10) - (10)].str));
+        free((yyvsp[(3) - (10)].str));
+        free((yyvsp[(8) - (10)].str));
+        free((yyvsp[(10) - (10)].str));
+      ;}
+    break;
+
+  case 20:
+
+/* Line 1455 of yacc.c  */
+#line 149 ".\\file_operations.y"
+    {
+        generate_switch_statement((yyvsp[(3) - (11)].str), (yyvsp[(6) - (11)].num), (yyvsp[(9) - (11)].str), (yyvsp[(11) - (11)].str));
+        free((yyvsp[(3) - (11)].str));
+        free((yyvsp[(9) - (11)].str));
+        free((yyvsp[(11) - (11)].str));
+      ;}
+    break;
+
+  case 21:
+
+/* Line 1455 of yacc.c  */
+#line 155 ".\\file_operations.y"
+    {
+        generate_case_statement((yyvsp[(3) - (5)].num), (yyvsp[(5) - (5)].str));
+        free((yyvsp[(5) - (5)].str));
+      ;}
+    break;
+
+  case 22:
+
+/* Line 1455 of yacc.c  */
+#line 159 ".\\file_operations.y"
+    {
+        generate_default_case((yyvsp[(4) - (4)].str));
+        free((yyvsp[(4) - (4)].str));
+      ;}
+    break;
+
+  case 23:
+
+/* Line 1455 of yacc.c  */
+#line 163 ".\\file_operations.y"
+    {
+        generate_break_statement((yyvsp[(4) - (4)].str));
+        free((yyvsp[(4) - (4)].str));
+      ;}
+    break;
+
+  case 24:
+
+/* Line 1455 of yacc.c  */
+#line 167 ".\\file_operations.y"
+    {
+        generate_close_brace((yyvsp[(4) - (4)].str));
+        free((yyvsp[(4) - (4)].str));
+      ;}
+    break;
+
+  case 25:
+
+/* Line 1455 of yacc.c  */
+#line 171 ".\\file_operations.y"
+    {
+        generate_array((yyvsp[(3) - (11)].str), (yyvsp[(5) - (11)].num), (yyvsp[(7) - (11)].num), (yyvsp[(9) - (11)].str), (yyvsp[(11) - (11)].str));
+        free((yyvsp[(3) - (11)].str));
+        free((yyvsp[(9) - (11)].str));
+        free((yyvsp[(11) - (11)].str));
+      ;}
+    break;
+
+  case 26:
+
+/* Line 1455 of yacc.c  */
+#line 178 ".\\file_operations.y"
+    {
+        generate_array_iteration((yyvsp[(4) - (11)].str), (yyvsp[(7) - (11)].str), (yyvsp[(9) - (11)].str), (yyvsp[(11) - (11)].str));
+        free((yyvsp[(4) - (11)].str));
+        free((yyvsp[(7) - (11)].str));
+        free((yyvsp[(9) - (11)].str));
+        free((yyvsp[(11) - (11)].str));
+      ;}
+    break;
+
+  case 27:
+
+/* Line 1455 of yacc.c  */
+#line 185 ".\\file_operations.y"
+    {
+        generate_create_file((yyvsp[(3) - (11)].str));
+        generate_add_function((yyvsp[(7) - (11)].str), (yyvsp[(3) - (11)].str));
+        generate_add_function((yyvsp[(8) - (11)].str), (yyvsp[(3) - (11)].str));
+        generate_add_function((yyvsp[(9) - (11)].str), (yyvsp[(3) - (11)].str));
+        generate_add_function((yyvsp[(10) - (11)].str), (yyvsp[(3) - (11)].str));
+        generate_add_function((yyvsp[(11) - (11)].str), (yyvsp[(3) - (11)].str));
+        free((yyvsp[(3) - (11)].str));
+        free((yyvsp[(7) - (11)].str));
+        free((yyvsp[(8) - (11)].str));
+        free((yyvsp[(9) - (11)].str));
+        free((yyvsp[(10) - (11)].str));
+        free((yyvsp[(11) - (11)].str));
       ;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1411 "file_operations.tab.c"
+#line 1800 "file_operations.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1619,8 +2008,63 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 57 ".\\file_operations.y"
+#line 201 ".\\file_operations.y"
 
+
+/* Check if a variable exists in a function */
+int variable_exists_in_function(const char *var, const char *funcname, const char *filename) {
+    char full_name[100];
+    snprintf(full_name, sizeof(full_name), "%s.c", filename);
+
+    FILE *fp = fopen(full_name, "r");
+    if (!fp) {
+        printf("Error: File '%s' does not exist.\n", full_name);
+        return 0;
+    }
+
+    char line[256];
+    int in_function = 0;
+    int var_found = 0;
+    int brace_count = 0;
+    char function_pattern[256];
+    
+    // Create pattern to search for function
+    snprintf(function_pattern, sizeof(function_pattern), "%s(", funcname);
+    
+    while (fgets(line, sizeof(line), fp)) {
+        // Check if we're entering the target function
+        if (!in_function && strstr(line, function_pattern)) {
+            in_function = 1;
+        }
+        
+        // If in function, check for variable declaration or usage
+        if (in_function) {
+            // Count braces to track function scope
+            for (char *c = line; *c; c++) {
+                if (*c == '{') brace_count++;
+                if (*c == '}') brace_count--;
+            }
+            
+            // Check if we've exited the function
+            if (brace_count <= 0 && strstr(line, "}")) {
+                break;
+            }
+            
+            // Check for variable in different contexts
+            char var_pattern[256];
+            snprintf(var_pattern, sizeof(var_pattern), "int %s", var); // Check for declaration
+            
+            if (strstr(line, var_pattern) || 
+                (strstr(line, var) && (line[0] == ' ' || line[0] == '\t'))) {
+                var_found = 1;
+                break;
+            }
+        }
+    }
+    
+    fclose(fp);
+    return var_found;
+}
 
 void generate_create_file(const char *filename) {
     char full_name[100];
@@ -1745,24 +2189,914 @@ void generate_delete_function(const char *funcname, const char *filename) {
     printf("Function '%s' deleted from %s.\n", funcname, full_name);
 }
 
-void generate_for_loop(const char *var, int limit, int step, const char *filename) {
+long find_insertion_point_in_function(const char *file_content, const char *funcname) {
+    // Create pattern to search for function
+    char pattern[256];
+    snprintf(pattern, sizeof(pattern), "%s(", funcname);
+    
+    char *func_pos = strstr(file_content, pattern);
+    if (!func_pos) {
+        return -1; // Function not found
+    }
+    
+    // Find the opening brace of the function
+    char *brace_pos = strchr(func_pos, '{');
+    if (!brace_pos) {
+        return -1; // Opening brace not found
+    }
+    
+    // Now find the right position to insert code - this should be right before the 
+    // closing brace of the function, not after content at brace level 1
+    char *current_pos = brace_pos + 1;
+    int brace_level = 1;
+    
+    // Track the position until we find the closing brace of the function
+    while (*current_pos && brace_level > 0) {
+        if (*current_pos == '{') {
+            brace_level++;
+        } else if (*current_pos == '}') {
+            brace_level--;
+            
+            // If this is the closing brace of the function, we found our spot
+            if (brace_level == 0) {
+                // Find the start of this line or the last newline before the brace
+                char *line_start = current_pos;
+                while (line_start > brace_pos && *(line_start-1) != '\n') {
+                    line_start--;
+                }
+                
+                // Return position right before the closing brace indentation
+                return (line_start - file_content);
+            }
+        }
+        
+        current_pos++;
+    }
+    
+    // If we couldn't find the closing brace for some reason, 
+    // fall back to position after opening brace
+    return (brace_pos - file_content) + 1;
+}
+
+// Now modify the generate_for_loop function to use the new helper function
+void generate_for_loop(const char *var, int limit, int step, const char *funcname, const char *filename) {
+    char full_name[100];
+    snprintf(full_name, sizeof(full_name), "%s.c", filename);
+
+    // First, let's check if the file exists
+    FILE *fp = fopen(full_name, "r");
+    if (!fp) {
+        printf("Error: File '%s' does not exist.\n", full_name);
+        return;
+    }
+
+    // Read the entire file content into memory
+    fseek(fp, 0, SEEK_END);
+    long file_size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    
+    char *file_content = (char *)malloc(file_size + 1);
+    if (!file_content) {
+        fclose(fp);
+        perror("Memory allocation error");
+        return;
+    }
+    
+    size_t read_size = fread(file_content, 1, file_size, fp);
+    file_content[read_size] = '\0';
+    fclose(fp);
+    
+    // Find the proper insertion point
+    long insert_pos = find_insertion_point_in_function(file_content, funcname);
+    if (insert_pos < 0) {
+        printf("Function '%s' not found in %s or its structure is invalid.\n", funcname, full_name);
+        free(file_content);
+        return;
+    }
+    
+    // Create the for loop code with proper indentation
+    char for_loop[256];
+    snprintf(for_loop, sizeof(for_loop), 
+             "    for (int %s = 0; %s < %d; %s += %d) {\n        // TODO: Add logic\n    }\n",
+             var, var, limit, var, step);
+    
+    // Create a new file with the for loop inserted
+    FILE *out = fopen("temp.c", "w");
+    if (!out) {
+        free(file_content);
+        perror("Error creating temporary file");
+        return;
+    }
+    
+    // Write content before insertion point
+    fwrite(file_content, 1, insert_pos, out);
+    
+    // Write for loop
+    fputs(for_loop, out);
+    
+    // Write remaining content
+    fputs(file_content + insert_pos, out);
+    
+    fclose(out);
+    free(file_content);
+    
+    // Replace original file with the modified one
+    remove(full_name);
+    rename("temp.c", full_name);
+    
+    printf("For loop with '%s' added to function '%s' in %s up to %d with step %d\n", 
+           var, funcname, full_name, limit, step);
+}
+
+// Similarly, update generate_if_statement to use the new helper
+void generate_if_statement(const char *var, const char *op, int value, const char *funcname, const char *filename) {
+    char full_name[100];
+    snprintf(full_name, sizeof(full_name), "%s.c", filename);
+    
+    // Check if file exists
+    FILE *fp_check = fopen(full_name, "r");
+    if (!fp_check) {
+        printf("Error: File '%s' does not exist.\n", full_name);
+        return;
+    }
+    fclose(fp_check);
+    
+    // Check if function exists and variable exists in function
+    if (!variable_exists_in_function(var, funcname, filename)) {
+        printf("Error: Variable '%s' not found in function '%s' in file '%s'.\n", 
+               var, funcname, full_name);
+        return;
+    }
+    
+    // Read the entire file content
+    FILE *fp = fopen(full_name, "r");
+    fseek(fp, 0, SEEK_END);
+    long file_size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    
+    char *file_content = (char *)malloc(file_size + 1);
+    if (!file_content) {
+        fclose(fp);
+        perror("Memory allocation error");
+        return;
+    }
+    
+    size_t read_size = fread(file_content, 1, file_size, fp);
+    file_content[read_size] = '\0';
+    fclose(fp);
+    
+    // Find the proper insertion point
+    long insert_pos = find_insertion_point_in_function(file_content, funcname);
+    if (insert_pos < 0) {
+        printf("Function '%s' not found in %s or its structure is invalid.\n", funcname, full_name);
+        free(file_content);
+        return;
+    }
+    
+    // Create the if statement code with proper indentation
+    char if_statement[256];
+    snprintf(if_statement, sizeof(if_statement), 
+             "    if (%s %s %d) {\n        // TODO: Add logic for if condition\n    }\n",
+             var, op, value);
+    
+    // Create a new file with the if statement inserted
+    FILE *out = fopen("temp.c", "w");
+    if (!out) {
+        free(file_content);
+        perror("Error creating temporary file");
+        return;
+    }
+    
+    // Write content before insertion point
+    fwrite(file_content, 1, insert_pos, out);
+    
+    // Write if statement
+    fputs(if_statement, out);
+    
+    // Write remaining content
+    fputs(file_content + insert_pos, out);
+    
+    fclose(out);
+    free(file_content);
+    
+    // Replace original file with the modified one
+    remove(full_name);
+    rename("temp.c", full_name);
+    
+    printf("If statement for '%s %s %d' added to function '%s' in %s\n", 
+           var, op, value, funcname, full_name);
+}
+
+// Update generate_if_else_statement to use the new helper
+void generate_if_else_statement(const char *var, const char *op, int value, const char *funcname, const char *filename) {
+    char full_name[100];
+    snprintf(full_name, sizeof(full_name), "%s.c", filename);
+    
+    // Check if file exists
+    FILE *fp_check = fopen(full_name, "r");
+    if (!fp_check) {
+        printf("Error: File '%s' does not exist.\n", full_name);
+        return;
+    }
+    fclose(fp_check);
+    
+    // Check if function exists and variable exists in function
+    if (!variable_exists_in_function(var, funcname, filename)) {
+        printf("Error: Variable '%s' not found in function '%s' in file '%s'.\n", 
+               var, funcname, full_name);
+        return;
+    }
+    
+    // Read the entire file content
+    FILE *fp = fopen(full_name, "r");
+    fseek(fp, 0, SEEK_END);
+    long file_size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    
+    char *file_content = (char *)malloc(file_size + 1);
+    if (!file_content) {
+        fclose(fp);
+        perror("Memory allocation error");
+        return;
+    }
+    
+    size_t read_size = fread(file_content, 1, file_size, fp);
+    file_content[read_size] = '\0';
+    fclose(fp);
+    
+    // Find the proper insertion point
+    long insert_pos = find_insertion_point_in_function(file_content, funcname);
+    if (insert_pos < 0) {
+        printf("Function '%s' not found in %s or its structure is invalid.\n", funcname, full_name);
+        free(file_content);
+        return;
+    }
+    
+    // Create the if-else statement code with proper indentation
+    char if_else_statement[256];
+    snprintf(if_else_statement, sizeof(if_else_statement), 
+             "    if (%s %s %d) {\n        // TODO: Add logic for if condition\n    } else {\n        // TODO: Add logic for else condition\n    }\n",
+             var, op, value);
+    
+    // Create a new file with the if-else statement inserted
+    FILE *out = fopen("temp.c", "w");
+    if (!out) {
+        free(file_content);
+        perror("Error creating temporary file");
+        return;
+    }
+    
+    // Write content before insertion point
+    fwrite(file_content, 1, insert_pos, out);
+    
+    // Write if-else statement
+    fputs(if_else_statement, out);
+    
+    // Write remaining content
+    fputs(file_content + insert_pos, out);
+    
+    fclose(out);
+    free(file_content);
+    
+    // Replace original file with the modified one
+    remove(full_name);
+    rename("temp.c", full_name);
+    
+    printf("If-else statement for '%s %s %d' added to function '%s' in %s\n", 
+           var, op, value, funcname, full_name);
+}
+
+// Update generate_switch_statement to use the new helper
+void generate_switch_statement(const char *var, int cases, const char *funcname, const char *filename) {
+    char full_name[100];
+    snprintf(full_name, sizeof(full_name), "%s.c", filename);
+    
+    // Check if file exists
+    FILE *fp_check = fopen(full_name, "r");
+    if (!fp_check) {
+        printf("Error: File '%s' does not exist.\n", full_name);
+        return;
+    }
+    fclose(fp_check);
+    
+    // Check if function exists and variable exists in function
+    if (!variable_exists_in_function(var, funcname, filename)) {
+        printf("Error: Variable '%s' not found in function '%s' in file '%s'.\n", 
+               var, funcname, full_name);
+        return;
+    }
+    
+    // Read the entire file content
+    FILE *fp = fopen(full_name, "r");
+    fseek(fp, 0, SEEK_END);
+    long file_size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    
+    char *file_content = (char *)malloc(file_size + 1);
+    if (!file_content) {
+        fclose(fp);
+        perror("Memory allocation error");
+        return;
+    }
+    
+    size_t read_size = fread(file_content, 1, file_size, fp);
+    file_content[read_size] = '\0';
+    fclose(fp);
+    
+    // Find the proper insertion point
+    long insert_pos = find_insertion_point_in_function(file_content, funcname);
+    if (insert_pos < 0) {
+        printf("Function '%s' not found in %s or its structure is invalid.\n", funcname, full_name);
+        free(file_content);
+        return;
+    }
+    
+    // Create buffer for the switch statement
+    char *switch_code = (char *)malloc(1024);
+    if (!switch_code) {
+        free(file_content);
+        perror("Memory allocation error");
+        return;
+    }
+    
+    // Start the switch statement with proper indentation
+    sprintf(switch_code, "    switch (%s) {\n", var);
+    
+    // Add the specified number of cases
+    for (int i = 1; i <= cases; i++) {
+        char case_code[256];
+        sprintf(case_code, "        case %d:\n            // TODO: Add logic for case %d\n            break;\n", i, i);
+        strcat(switch_code, case_code);
+    }
+    
+    // Add default case and close the switch
+    strcat(switch_code, "        default:\n            // TODO: Add logic for default case\n            break;\n    }\n");
+    
+    // Create a new file with the switch statement inserted
+    FILE *out = fopen("temp.c", "w");
+    if (!out) {
+        free(file_content);
+        free(switch_code);
+        perror("Error creating temporary file");
+        return;
+    }
+    
+    // Write content before insertion point
+    fwrite(file_content, 1, insert_pos, out);
+    
+    // Write switch statement
+    fputs(switch_code, out);
+    
+    // Write remaining content
+    fputs(file_content + insert_pos, out);
+    
+    fclose(out);
+    free(file_content);
+    free(switch_code);
+    
+    // Replace original file with the modified one
+    remove(full_name);
+    rename("temp.c", full_name);
+    
+    printf("Switch statement for '%s' with %d cases added to function '%s' in %s\n", 
+           var, cases, funcname, full_name);
+}
+
+void generate_case_statement(int value, const char *filename) {
     char full_name[100];
     snprintf(full_name, sizeof(full_name), "%s.c", filename);
 
     FILE *fp = fopen(full_name, "a");
     if (!fp) {
-        perror("Error opening file for loop");
+        perror("Error opening file for case statement");
         return;
     }
 
-    fprintf(fp,
-        "\nfor (int %s = 0; %s < %d; %s += %d) {\n    // TODO: Add logic\n}\n",
-        var, var, limit, var, step
-    );
+    fprintf(fp, "    case %d:\n        // TODO: Add logic for case %d\n", value, value);
     fclose(fp);
-    printf("For loop with '%s' added to %s up to %d with step %d\n", var, full_name, limit, step);
+    printf("Case %d added to %s\n", value, full_name);
 }
 
+void generate_default_case(const char *filename) {
+    char full_name[100];
+    snprintf(full_name, sizeof(full_name), "%s.c", filename);
+
+    FILE *fp = fopen(full_name, "a");
+    if (!fp) {
+        perror("Error opening file for default case");
+        return;
+    }
+
+    fprintf(fp, "    default:\n        // TODO: Add logic for default case\n");
+    fclose(fp);
+    printf("Default case added to %s\n", full_name);
+}
+
+void generate_break_statement(const char *filename) {
+    char full_name[100];
+    snprintf(full_name, sizeof(full_name), "%s.c", filename);
+
+    FILE *fp = fopen(full_name, "a");
+    if (!fp) {
+        perror("Error opening file for break statement");
+        return;
+    }
+
+    fprintf(fp, "        break;\n");
+    fclose(fp);
+    printf("Break statement added to %s\n", full_name);
+}
+
+void generate_close_brace(const char *filename) {
+    char full_name[100];
+    snprintf(full_name, sizeof(full_name), "%s.c", filename);
+
+    FILE *fp = fopen(full_name, "a");
+    if (!fp) {
+        perror("Error opening file to close brace");
+        return;
+    }
+
+    fprintf(fp, "}\n");
+    fclose(fp);
+    printf("Closing brace added to %s\n", full_name);
+}
+
+void generate_array(const char *array_name, int start, int end, const char *funcname, const char *filename) {
+    char full_name[100];
+    snprintf(full_name, sizeof(full_name), "%s.c", filename);
+
+    // Check if file exists
+    FILE *fp_check = fopen(full_name, "r");
+    if (!fp_check) {
+        printf("Error: File '%s' does not exist.\n", full_name);
+        return;
+    }
+    fclose(fp_check);
+    
+    // Read the entire file content
+    FILE *fp = fopen(full_name, "r");
+    fseek(fp, 0, SEEK_END);
+    long file_size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    
+    char *file_content = (char *)malloc(file_size + 1);
+    if (!file_content) {
+        fclose(fp);
+        perror("Memory allocation error");
+        return;
+    }
+    
+    size_t read_size = fread(file_content, 1, file_size, fp);
+    file_content[read_size] = '\0';
+    fclose(fp);
+    
+    // Find the proper insertion point
+    long insert_pos = find_insertion_point_in_function(file_content, funcname);
+    if (insert_pos < 0) {
+        printf("Function '%s' not found in %s or its structure is invalid.\n", funcname, full_name);
+        free(file_content);
+        return;
+    }
+    
+    // Calculate array size
+    int size = end - start + 1;
+    if (size <= 0) {
+        printf("Error: Invalid array range (start: %d, end: %d).\n", start, end);
+        free(file_content);
+        return;
+    }
+    
+    // Create array declaration and initialization
+    char *array_code = (char *)malloc(size * 20 + 256); // Allocate enough space
+    if (!array_code) {
+        free(file_content);
+        perror("Memory allocation error");
+        return;
+    }
+    
+    // Create array declaration with proper indentation
+    sprintf(array_code, "    int %s[%d] = {", array_name, size);
+    
+    // Initialize array with values
+    for (int i = 0; i < size; i++) {
+        char value[20];
+        sprintf(value, "%d", start + i);
+        
+        // Add comma except for the last element
+        if (i < size - 1) {
+            strcat(value, ", ");
+        }
+        
+        strcat(array_code, value);
+        
+        // Add line break every 10 elements for readability
+        if ((i + 1) % 10 == 0 && i < size - 1) {
+            strcat(array_code, "\n        ");
+        }
+    }
+    
+    // Close the array initialization
+    strcat(array_code, "};\n");
+    
+    // Create a new file with the array inserted
+    FILE *out = fopen("temp.c", "w");
+    if (!out) {
+        free(file_content);
+        free(array_code);
+        perror("Error creating temporary file");
+        return;
+    }
+    
+    // Write content before insertion point
+    fwrite(file_content, 1, insert_pos, out);
+    
+    // Write array code
+    fputs(array_code, out);
+    
+    // Write remaining content
+    fputs(file_content + insert_pos, out);
+    
+    fclose(out);
+    free(file_content);
+    free(array_code);
+    
+    // Replace original file with the modified one
+    remove(full_name);
+    rename("temp.c", full_name);
+    
+    printf("Array '%s' with range [%d-%d] (size: %d) added to function '%s' in %s\n", 
+           array_name, start, end, size, funcname, full_name);
+}
+
+void generate_array_iteration(const char *array_name, const char *index_var, const char *funcname, const char *filename) {
+    char full_name[100];
+    snprintf(full_name, sizeof(full_name), "%s.c", filename);
+    
+    // Check if file exists
+    FILE *fp_check = fopen(full_name, "r");
+    if (!fp_check) {
+        printf("Error: File '%s' does not exist.\n", full_name);
+        return;
+    }
+    fclose(fp_check);
+    
+    // Check if function exists and array exists in function
+    if (!variable_exists_in_function(array_name, funcname, filename)) {
+        printf("Error: Array '%s' not found in function '%s' in file '%s'.\n", 
+               array_name, funcname, full_name);
+        return;
+    }
+    
+    // Read the entire file content
+    FILE *fp = fopen(full_name, "r");
+    fseek(fp, 0, SEEK_END);
+    long file_size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    
+    char *file_content = (char *)malloc(file_size + 1);
+    if (!file_content) {
+        fclose(fp);
+        perror("Memory allocation error");
+        return;
+    }
+    
+    size_t read_size = fread(file_content, 1, file_size, fp);
+    file_content[read_size] = '\0';
+    fclose(fp);
+    
+    // Find the proper insertion point (at the end of the function)
+    long insert_pos = find_insertion_point_in_function(file_content, funcname);
+    if (insert_pos < 0) {
+        printf("Function '%s' not found in %s or its structure is invalid.\n", funcname, full_name);
+        free(file_content);
+        return;
+    }
+    
+    // Try to determine array size
+    char *array_size = NULL;
+    char *array_decl_pos = strstr(file_content, array_name);
+    if (array_decl_pos) {
+        char *open_bracket = strchr(array_decl_pos, '[');
+        if (open_bracket) {
+            char *close_bracket = strchr(open_bracket, ']');
+            if (close_bracket && close_bracket > open_bracket) {
+                int size = close_bracket - open_bracket - 1;
+                array_size = (char *)malloc(size + 1);
+                strncpy(array_size, open_bracket + 1, size);
+                array_size[size] = '\0';
+            }
+        }
+    }
+    
+    // Create the array iteration code
+    char *iteration_code = (char *)malloc(512);
+    if (!iteration_code) {
+        free(file_content);
+        if (array_size) free(array_size);
+        perror("Memory allocation error");
+        return;
+    }
+    
+    if (array_size) {
+        // If we found the array size, use it
+        sprintf(iteration_code, 
+                "    // Iterating through array %s\n    for (int %s = 0; %s < %s; %s++) {\n"
+                "        // TODO: Process %s[%s]\n"
+                "        // Example: printf(\"%%d \", %s[%s]);\n"
+                "    }\n",
+                array_name, index_var, index_var, array_size, index_var,
+                array_name, index_var, array_name, index_var);
+        free(array_size);
+    } else {
+        // If we couldn't determine the size, add a placeholder
+        sprintf(iteration_code, 
+                "    // Iterating through array %s\n    for (int %s = 0; %s < ARRAY_SIZE; %s++) {\n"
+                "        // TODO: Replace ARRAY_SIZE with the actual size of %s\n"
+                "        // TODO: Process %s[%s]\n"
+                "        // Example: printf(\"%%d \", %s[%s]);\n"
+                "    }\n",
+                array_name, index_var, index_var, index_var, array_name,
+                array_name, index_var, array_name, index_var);
+    }
+    
+    // Create a new file with the iteration code inserted
+    FILE *out = fopen("temp.c", "w");
+    if (!out) {
+        free(file_content);
+        free(iteration_code);
+        perror("Error creating temporary file");
+        return;
+    }
+    
+    // Write content before insertion point
+    fwrite(file_content, 1, insert_pos, out);
+    
+    // Write iteration code
+    fputs(iteration_code, out);
+    
+    // Write remaining content
+    fputs(file_content + insert_pos, out);
+    
+    fclose(out);
+    free(file_content);
+    free(iteration_code);
+    
+    // Replace original file with the modified one
+    remove(full_name);
+    rename("temp.c", full_name);
+    
+    printf("Array iteration for '%s' using index '%s' added to function '%s' in %s\n", 
+           array_name, index_var, funcname, full_name);
+}
+
+void optimize_code(const char *filename) {
+    char full_name[100];
+    snprintf(full_name, sizeof(full_name), "%s.c", filename);
+    
+    // Check if file exists
+    FILE *fp_check = fopen(full_name, "r");
+    if (!fp_check) {
+        printf("Error: File '%s' does not exist.\n", full_name);
+        return;
+    }
+    
+    // Read the entire file content
+    fseek(fp_check, 0, SEEK_END);
+    long file_size = ftell(fp_check);
+    fseek(fp_check, 0, SEEK_SET);
+    
+    char *file_content = (char *)malloc(file_size + 1);
+    if (!file_content) {
+        fclose(fp_check);
+        perror("Memory allocation error");
+        return;
+    }
+    
+    size_t read_size = fread(file_content, 1, file_size, fp_check);
+    file_content[read_size] = '\0';
+    fclose(fp_check);
+    
+    // Create a new temporary file
+    FILE *out = fopen("temp.c", "w");
+    if (!out) {
+        free(file_content);
+        perror("Error creating temporary file");
+        return;
+    }
+    
+    // Track changes made
+    int changes = 0;
+    char *optimized_content = strdup(file_content);
+    if (!optimized_content) {
+        free(file_content);
+        fclose(out);
+        perror("Memory allocation error");
+        return;
+    }
+    
+   
+    char *ptr = optimized_content;
+    while ((ptr = strstr(ptr, "int ")) != NULL) {
+        // Check if variable is used
+        char var_name[100] = {0};
+        if (sscanf(ptr + 4, "%99[a-zA-Z0-9_]", var_name) == 1) {
+          
+            char *first_use = ptr;
+            char *next_use = ptr + strlen(var_name) + 4;
+            
+           
+            char search_pattern[150];
+            snprintf(search_pattern, sizeof(search_pattern), "%s", var_name);
+            
+            int usage_count = 0;
+            char *search_pos = optimized_content;
+            while ((search_pos = strstr(search_pos, search_pattern)) != NULL) {
+                // Check if this is a proper variable usage
+                char prev_char = (search_pos > optimized_content) ? *(search_pos - 1) : ' ';
+                char next_char = *(search_pos + strlen(search_pattern));
+                
+                if ((prev_char == ' ' || prev_char == '\t' || prev_char == '(' || prev_char == '=') &&
+                    (next_char == ' ' || next_char == ';' || next_char == ')' || next_char == ',' || 
+                     next_char == '+' || next_char == '-' || next_char == '*' || next_char == '/')) {
+                    usage_count++;
+                }
+                search_pos += strlen(search_pattern);
+            }
+            
+            // If used exactly once (declaration), mark for potential optimization
+            if (usage_count == 1) {
+                // We would normally optimize this, but for now we'll just notify
+                changes++;
+            }
+        }
+        ptr++;
+    }
+    
+    // 2. Optimize loop conditions
+    ptr = optimized_content;
+    while ((ptr = strstr(ptr, "for (")) != NULL) {
+        char init[100], cond[100], incr[100];
+        // Try to parse the for loop components
+        if (sscanf(ptr + 5, "%99[^;];%99[^;];%99[^)]", init, cond, incr) == 3) {
+            // Check if we can optimize the loop
+            if (strstr(cond, "<") && !strstr(cond, "=")) {
+                // Convert "i < n" to "i != n" for certain loops where appropriate
+                if (strstr(incr, "++") || strstr(incr, "+=1")) {
+                    char *lt_pos = strstr(cond, "<");
+                    if (lt_pos) {
+                        // Replace < with != where it makes sense
+                        // This is a heuristic optimization that works in some cases
+                        memcpy(lt_pos, "!=", 2);
+                        changes++;
+                    }
+                }
+            }
+        }
+        ptr++;
+    }
+    
+    // 3. Optimize redundant code
+    ptr = optimized_content;
+    while ((ptr = strstr(ptr, "if (")) != NULL) {
+        // Look for redundant conditions like "if (x == true)" or "if (x == false)"
+        char cond[100];
+        if (sscanf(ptr + 4, "(%99[^)])", cond) == 1) {
+            if (strstr(cond, "== true")) {
+                // Replace "x == true" with "x"
+                char *true_pos = strstr(cond, "== true");
+                size_t prefix_len = true_pos - cond;
+                
+                // Ensure we have space for the string manipulation
+                char *new_condition = (char *)malloc(strlen(cond) + 1);
+                if (new_condition) {
+                    strncpy(new_condition, cond, prefix_len);
+                    new_condition[prefix_len] = '\0';
+                    strcat(new_condition, true_pos + 7); // Skip "== true"
+                    
+                    // Replace in optimized content
+                    char *start_of_condition = ptr + 4;
+                    char *end_of_condition = strchr(start_of_condition, ')');
+                    if (end_of_condition) {
+                        size_t old_len = end_of_condition - start_of_condition;
+                        size_t new_len = strlen(new_condition);
+                        
+                        if (new_len <= old_len) {
+                            // Overwrite in place
+                            memcpy(start_of_condition, new_condition, new_len);
+                            // Fill rest with spaces
+                            memset(start_of_condition + new_len, ' ', old_len - new_len);
+                            changes++;
+                        }
+                    }
+                    free(new_condition);
+                }
+            }
+            else if (strstr(cond, "== false")) {
+                // Replace "x == false" with "!x"
+                char *false_pos = strstr(cond, "== false");
+                size_t prefix_len = false_pos - cond;
+                
+                // Ensure we have space for the string manipulation
+                char *new_condition = (char *)malloc(strlen(cond) + 2); // +2 for '!' and null terminator
+                if (new_condition) {
+                    new_condition[0] = '!';
+                    strncpy(new_condition + 1, cond, prefix_len);
+                    new_condition[prefix_len + 1] = '\0';
+                    strcat(new_condition, false_pos + 8); // Skip "== false"
+                    
+                    // Replace in optimized content
+                    char *start_of_condition = ptr + 4;
+                    char *end_of_condition = strchr(start_of_condition, ')');
+                    if (end_of_condition) {
+                        size_t old_len = end_of_condition - start_of_condition;
+                        size_t new_len = strlen(new_condition);
+                        
+                        if (new_len <= old_len) {
+                            // Overwrite in place
+                            memcpy(start_of_condition, new_condition, new_len);
+                            // Fill rest with spaces
+                            memset(start_of_condition + new_len, ' ', old_len - new_len);
+                            changes++;
+                        }
+                    }
+                    free(new_condition);
+                }
+            }
+        }
+        ptr++;
+    }
+    
+    // 4. Loop unrolling optimization detection
+    ptr = optimized_content;
+    while ((ptr = strstr(ptr, "for (")) != NULL) {
+        int loop_count = 0;
+        // Check if this is a simple counting loop
+        if (sscanf(ptr, "for (int %*[^=]= %*d; %*[^<]< %d; %*[^{]{", &loop_count) == 1) {
+            // If the loop count is very small, consider unrolling
+            if (1 <= loop_count && loop_count <= 3) {
+                // For demonstration we're just marking potential unroll candidates
+                changes++;
+            }
+        }
+        ptr++;
+    }
+    
+    // 5. Constant folding optimization
+    ptr = optimized_content;
+    while ((ptr = strstr(ptr, " = ")) != NULL) {
+        int a, b, result;
+        char op;
+        
+        // Match patterns like: x = 5 + 3; or x = 10 * 2;
+        if (sscanf(ptr + 3, "%d %c %d;", &a, &op, &b) == 3) {
+            switch (op) {
+                case '+': result = a + b; break;
+                case '-': result = a - b; break;
+                case '*': result = a * b; break;
+                case '/': 
+                    if (b != 0) result = a / b; 
+                    else goto next_expr; // Skip division by zero
+                    break;
+                default: goto next_expr; // Skip if not a basic arithmetic operator
+            }
+            
+            // Format the replacement expression
+            char new_expr[50];
+            snprintf(new_expr, sizeof(new_expr), " = %d;", result);
+            
+            // Find the end of the original expression
+            char *expr_end = strchr(ptr + 3, ';');
+            if (expr_end) {
+                size_t old_len = (expr_end - ptr) - 2; // -2 to exclude " = "
+                size_t new_len = strlen(new_expr) - 3;  // -3 to exclude " = "
+                
+                // Replace the expression
+                if (new_len <= old_len) {
+                    memcpy(ptr + 3, new_expr + 3, new_len);
+                    // Fill rest with spaces
+                    memset(ptr + 3 + new_len, ' ', old_len - new_len);
+                    changes++;
+                }
+            }
+        }
+next_expr:
+        ptr++;
+    }
+    
+    // Write optimized content to the output file
+    fputs(optimized_content, out);
+    fclose(out);
+    free(file_content);
+    free(optimized_content);
+    
+    // Replace original file with the optimized one
+    remove(full_name);
+    rename("temp.c", full_name);
+    
+    printf("Code optimization complete for %s. %d potential optimization points identified.\n", 
+           full_name, changes);
+}
 int main() {
     FILE *fp = fopen("command.txt", "r");
     if (!fp) {
@@ -1775,4 +3109,3 @@ int main() {
     fclose(fp);
     return 0;
 }
-

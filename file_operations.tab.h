@@ -52,7 +52,30 @@
      WITH = 268,
      INCREMENT = 269,
      IN = 270,
-     UP_TO = 271
+     UP_TO = 271,
+     IF = 272,
+     ELSE = 273,
+     SWITCH = 274,
+     CASE = 275,
+     DEFAULT = 276,
+     BREAK = 277,
+     COLON = 278,
+     CONDITIONS = 279,
+     ITERATE = 280,
+     ARRAY = 281,
+     USING = 282,
+     INDEX = 283,
+     FROM = 284,
+     OPTIMIZE = 285,
+     FUNCTIONS = 286,
+     EQ = 287,
+     NEQ = 288,
+     LE = 289,
+     GE = 290,
+     LT = 291,
+     GT = 292,
+     CLOSE = 293,
+     BRACE = 294
    };
 #endif
 
@@ -63,15 +86,16 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 20 ".\\file_operations.y"
+#line 33 ".\\file_operations.y"
 
     char* str;
     int num;
+    char** str_array;
 
 
 
 /* Line 1676 of yacc.c  */
-#line 75 "file_operations.tab.h"
+#line 99 "file_operations.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

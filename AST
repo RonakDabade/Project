@@ -1,0 +1,195 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Node {
+    int type;            // Type of the node (e.g., command, function, for-loop, etc.)
+    void *data;          // Data related to this node (could be function name, condition, etc.)
+    struct Node *left;   // Left child (if applicable)
+    struct Node *right;  // Right child (if applicable)
+} Node;
+
+typedef enum {
+    CMD_CREATE_FILE,
+    CMD_DELETE_FILE,
+    CMD_CREATE_FUNCTION,
+    CMD_DELETE_FUNCTION,
+    CMD_CREATE_FOR_LOOP,
+    CMD_CREATE_IF,
+    CMD_CREATE_SWITCH
+} NodeType;
+
+// Node functions
+Node* create_node(NodeType type, void *data, Node* left, Node* right) {
+    Node* node = (Node*)malloc(sizeof(Node));
+    node->type = type;
+    node->data = data;
+    node->left = left;
+    node->right = right;
+    return node;
+}
+
+void free_ast(Node *node) {
+    if (node) {
+        if (node->data) free(node->data);
+        free_ast(node->left);
+        free_ast(node->right);
+        free(node);
+    }
+}
+
+void generate_create_file(const char *filename) {
+    printf("Creating file: %s\n", filename);
+    // Code to create file
+}
+
+void generate_delete_file(const char *filename) {
+    printf("Deleting file: %s\n", filename);
+    // Code to delete file
+}
+
+void generate_add_function(const char *func_name, const char *file_name) {
+    printf("Adding function %s to file %s\n", func_name, file_name);
+    // Code to add function
+}
+
+void generate_delete_function(const char *func_name, const char *file_name) {
+    printf("Deleting function %s from file %s\n", func_name, file_name);
+    // Code to delete function
+}
+
+void generate_for_loop(const char *var_name, int start, int end, const char *incr, const char *filename) {
+    printf("Generating for loop for variable %s with start %d, end %d, increment %s in file %s\n", var_name, start, end, incr, filename);
+    // Code to generate for-loop
+}
+
+void generate_if_statement(const char *condition, const char *then_code, const char *else_code) {
+    printf("Generating if statement with condition: %s\n", condition);
+    printf("Then: %s\n", then_code);
+    printf("Else: %s\n", else_code);
+    // Code to generate if statement
+}
+
+void generate_switch_statement(const char *variable, int case_count, const char *filename, const char *funcname) {
+    char full_name[100];
+    snprintf(full_name, sizeof(full_name), "%s.c", filename);
+
+    FILE *fp = fopen(full_name, "r");
+    if (!fp) {
+        printf("Error: File '%s' does not exist.\n", full_name);
+        return;
+    }
+
+    fseek(fp, 0, SEEK_END);
+    long length = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+
+    char *buffer = malloc(length + 1);
+    if (!buffer) {
+        fclose(fp);
+        printf("Memory allocation failed.\n");
+        return;
+    }
+
+    size_t bytes_read = fread(buffer, 1, length, fp);
+    buffer[bytes_read] = '\0';  // Null terminate
+    fclose(fp);
+
+    // Find function
+    char func_pattern[128];
+    snprintf(func_pattern, sizeof(func_pattern), "void %s()", funcname);
+    char *func_start = strstr(buffer, func_pattern);
+    if (!func_start) {
+        printf("Function '%s' doesn't exist in the file.\n", funcname);
+        free(buffer);
+        return;
+    }
+
+    // Find opening brace
+    char *brace_open = strchr(func_start, '{');
+    if (!brace_open) {
+        printf("Could not find opening brace for function '%s'.\n", funcname);
+        free(buffer);
+        return;
+    }
+
+    // Temporary file for writing
+    FILE *temp = fopen("temp.c", "w");
+    if (!temp) {
+        perror("Error creating temporary file");
+        free(buffer);
+        return;
+    }
+
+    size_t prefix_len = brace_open - buffer + 1;
+    fwrite(buffer, 1, prefix_len, temp);
+
+    // Insert switch statement
+    fprintf(temp, "\n    switch (%s) {\n", variable);
+    for (int i = 0; i < case_count; i++) {
+        fprintf(temp, "        case %d:\n            // TODO: Add case %d logic\n            break;\n", i, i);
+    }
+    fprintf(temp, "        default:\n            // TODO: Add default case logic\n            break;\n    }\n");
+
+    fputs(brace_open + 1, temp);
+
+    fclose(temp);
+    free(buffer);
+
+    // Replace original file with the new one
+    remove(full_name);
+    rename("temp.c", full_name);
+
+    printf("Switch statement inserted into function '%s' in file '%s'.\n", funcname, full_name);
+}
+
+// The code below simulates the parsing process using a simple interpreter.
+void generate_code(Node *ast) {
+    if (!ast) return;
+
+    switch (ast->type) {
+        case CMD_CREATE_FILE:
+            generate_create_file((char *)ast->data);
+            break;
+        case CMD_DELETE_FILE:
+            generate_delete_file((char *)ast->data);
+            break;
+        case CMD_CREATE_FUNCTION:
+            generate_add_function((char *)ast->data, (char *)ast->right->data);
+            break;
+        case CMD_DELETE_FUNCTION:
+            generate_delete_function((char *)ast->data, (char *)ast->right->data);
+            break;
+        case CMD_CREATE_FOR_LOOP:
+            generate_for_loop((char *)ast->data, ast->left->num, ast->right->num, ast->right->right->data, ast->right->right->right->data);
+            break;
+        case CMD_CREATE_IF:
+            generate_if_statement((char *)ast->data, (char *)ast->left->data, (char *)ast->right->data);
+            break;
+        case CMD_CREATE_SWITCH:
+            generate_switch_statement((char *)ast->data, ast->left->num, (char *)ast->right->data, (char *)ast->right->right->data);
+            break;
+    }
+
+    // Recursively process the left and right children
+    generate_code(ast->left);
+    generate_code(ast->right);
+}
+
+int main() {
+    // Manually create an AST for demonstration
+    Node *root = create_node(CMD_CREATE_SWITCH, strdup("x"), 
+                            create_node(CMD_CREATE_FOR_LOOP, strdup("i"), 
+                                        create_node(CMD_CREATE_IF, strdup("i < 10"), NULL, NULL),
+                                        create_node(CMD_CREATE_IF, strdup("i > 5"), NULL, NULL)),
+                            create_node(CMD_CREATE_FUNCTION, strdup("testFunc"), 
+                                        NULL, NULL));
+
+    // Process the AST to generate code
+    generate_code(root);
+
+    // Free the AST
+    free_ast(root);
+
+    return 0;
+}
